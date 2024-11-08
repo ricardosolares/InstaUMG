@@ -1,0 +1,29 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Crear Publicación</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <form (ngSubmit)="onSubmit()" #postForm="ngForm">
+    
+    <ion-item lines="full" class="ion-text-center">
+      <ion-button expand="block" color="tertiary" (click)="triggerFileInput()">
+        <ion-icon slot="start" name="image-outline"></ion-icon>
+        Seleccionar Imagen
+      </ion-button>
+      <input type="file" accept="image/*" (change)="onFileSelected($event)" hidden #fileInput />
+    </ion-item>
+
+    <ion-item *ngIf="imagePreview" lines="none" class="ion-margin-vertical">
+      <ion-img [src]="imagePreview" alt="Previsualización de la imagen"></ion-img>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Descripción</ion-label>
+      <ion-textarea [(ngModel)]="postDescription" name="description"></ion-textarea>
+    </ion-item>
+
+    <ion-button expand="full" type="submit" [disabled]="!imagePreview" color="primary">Publicar</ion-button>
+  </form>
+</ion-content>

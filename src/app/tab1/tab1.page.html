@@ -1,0 +1,58 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      InstaUMG
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon name="camera-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-card *ngFor="let post of publications">
+    <ion-row>
+      <ion-col size="2">
+        <ion-avatar>
+          <img [src]="post.userAvatar" />
+        </ion-avatar>
+      </ion-col>
+      <ion-col size="10">
+        <ion-card-header>
+          <ion-card-title>{{ post.username }}</ion-card-title>
+        </ion-card-header>
+      </ion-col>
+    </ion-row>
+    
+    <!-- Slider personalizado -->
+    <div class="slider-container">
+      <div class="slider" [ngStyle]="{'transform': 'translateX(-' + (post.currentSlide || 0) * 100 + '%)'}">
+        <div class="slide" *ngFor="let key of ['small', 'original', 'bw', 'sepia']">
+          <ion-img [src]="url + post.imagePaths[key]"></ion-img>
+        </div>
+      </div>
+      <div class="slider-controls">
+        <button (click)="prevSlide(post)">❮</button>
+        <button (click)="nextSlide(post)">❯</button>
+      </div>
+    </div>
+  
+    <ion-card-content>
+      <p>{{ post.description }}</p>
+      <ion-row>
+        <ion-col>
+          <ion-button fill="clear">
+            <ion-icon name="heart-outline"></ion-icon>
+          </ion-button>
+        </ion-col>
+        <ion-col>
+          <ion-button fill="clear">
+            <ion-icon name="chatbubble-outline"></ion-icon>
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-card-content>
+  </ion-card>  
+</ion-content>

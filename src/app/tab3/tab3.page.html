@@ -1,0 +1,134 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>{{currentUserInfo.nick}}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="logout()">
+        <ion-icon name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-grid>
+    <!-- Encabezado de perfil -->
+    <ion-row class="ion-justify-content-center ion-padding" style="padding-bottom: 0;">
+      <ion-col size="3" class="ion-text-center">
+        <!-- Imagen de perfil -->
+        <ion-avatar (click)="openImageSelectorModal()" style="width: 100%; height: auto; object-fit: cover;">
+          <img [src]="url_avatars + currentUserInfo.image" alt="Imagen de perfil" style="width: 100%; height: auto; object-fit: cover;" />
+        </ion-avatar>
+      </ion-col>
+      <ion-col size="9">
+        <!-- Información de estadísticas -->
+        <ion-row class="ion-justify-content-around ion-align-items-center">
+          <ion-col size="4" class="ion-text-center">
+            <h3>{{myPosts.length}}</h3>
+            <p>Posts</p>
+          </ion-col>
+          <ion-col size="4" class="ion-text-center">
+            <h3>1200</h3>
+            <p>Followers</p>
+          </ion-col>
+          <ion-col size="4" class="ion-text-center">
+            <h3>300</h3>
+            <p>Following</p>
+          </ion-col>
+        </ion-row>
+        <!-- Botón de editar perfil -->
+        <ion-row class="ion-padding-top" style="padding-top: 0;">
+          <ion-col>
+            <ion-button expand="full" shape="round" fill="outline" (click)="openEditProfileModal()">Editar perfil</ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-col>
+    </ion-row>
+
+    <!-- Nombre de usuario y descripción -->
+    <ion-row class="ion-padding-horizontal">
+      <ion-col>
+        <h2 class="ion-text-bold" style="margin-top: 0;">{{currentUserInfo.name}}</h2>
+        <p>{{currentUserInfo.descripcion}}</p>
+      </ion-col>
+    </ion-row>
+
+    <!-- Galería de publicaciones -->
+    <ion-row>
+      <ion-col size="4" *ngFor="let post of myPosts">
+        <ion-img [src]="url_posts_media + post.imagePaths['small']"></ion-img>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- Modal de edición de perfil -->
+  <ion-modal [isOpen]="isEditProfileModalOpen" (willDismiss)="closeEditProfileModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Editar Perfil</ion-title>
+          <ion-buttons slot="start">
+            <ion-button (click)="closeEditProfileModal()">Cancelar</ion-button>
+          </ion-buttons>
+          <ion-buttons slot="end">
+            <ion-button (click)="saveProfile()">Confirmar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <ion-list>
+          <ion-item>
+            <ion-input
+              label="Usuario"
+              labelPlacement="stacked"
+              type="text"
+              placeholder="Usuario"
+              [(ngModel)]="editProfileData.nick"
+            ></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-input
+              label="Nombre"
+              labelPlacement="stacked"
+              type="text"
+              placeholder="Nombre"
+              [(ngModel)]="editProfileData.name"
+            ></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-input
+              label="Descripcion"
+              labelPlacement="stacked"
+              type="text"
+              placeholder="Descripcion"
+              [(ngModel)]="editProfileData.descripcion"
+            ></ion-input>
+          </ion-item>
+        </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+  <!-- Modal de selección de imagen -->
+  <ion-modal [isOpen]="isImageSelectorModalOpen" (willDismiss)="closeImageSelectorModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Actualizar Foto</ion-title>
+          <ion-buttons slot="start">
+            <ion-button (click)="closeImageSelectorModal()">Cancelar</ion-button>
+          </ion-buttons>
+          <ion-buttons slot="end">
+            <ion-button (click)="updateProfileImage()">Confirmar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <ion-item>
+          <input type="file" (change)="onImageSelected($event)" accept="image/*" />
+        </ion-item>
+        <ion-item *ngIf="selectedImage" class="ion-text-center">
+          <ion-img [src]="selectedImage" alt="Previsualización de la imagen" style="width: 100%; height: auto; border-radius: 8px;"></ion-img>
+        </ion-item>
+      </ion-content>
+    </ng-template>
+  </ion-modal>  
+</ion-content>

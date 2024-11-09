@@ -24,13 +24,11 @@ export class Tab3Page implements OnInit {
   ];
 
   myPosts: any = [];
-
   currentUserInfo: any = {}; // Información del usuario
   editProfileData: any = {}; // Datos para el formulario de edición
   isEditProfileModalOpen: boolean = false; // Estado para controlar la visibilidad del modal
   selectedImage: string | ArrayBuffer | null = null; // Para almacenar la previsualización de la imagen seleccionada
   isImageSelectorModalOpen: boolean = false; // Controla la visibilidad del modal de selección de imagen
-
 
   constructor(
     private http: HttpClient,
@@ -82,25 +80,25 @@ export class Tab3Page implements OnInit {
     const token = sessionStorage.getItem('token'); // Obtén el token de sessionStorage
 
     if (userId && token) {
-        const url = `${this.url_posts}/api/images/publications/user/${userId}`;
-        const headers = new HttpHeaders().set('Authorization', token);
+      const url = `${this.url_posts}/api/images/publications/user/${userId}`;
+      const headers = new HttpHeaders().set('Authorization', token);
 
-        this.http.get(url, { headers }).subscribe(
-            (response: any) => {
-                this.myPosts = response;
-                console.log(response)
-            },
-            async (error) => {
-                const alert = await this.alertController.create({
-                    header: 'Error',
-                    message: 'Ocurrió un error al cargar las publicaciones del usuario.',
-                    buttons: ['Aceptar']
-                });
-                await alert.present();
-            }
-        );
+      this.http.get(url, { headers }).subscribe(
+        (response: any) => {
+          this.myPosts = response;
+          console.log(response)
+        },
+        async (error) => {
+          const alert = await this.alertController.create({
+            header: 'Error',
+            message: 'Ocurrió un error al cargar las publicaciones del usuario.',
+            buttons: ['Aceptar']
+          });
+          await alert.present();
+        }
+      );
     } else {
-        console.error("No se encontró el id o token en sessionStorage");
+      console.error("No se encontró el id o token en sessionStorage");
     }
   }
 
@@ -138,90 +136,95 @@ export class Tab3Page implements OnInit {
   // Guardar cambios del perfil
   async saveProfile() {
     if (!this.editProfileData.name || !this.editProfileData.nick) {
-        const alert = await this.alertController.create({
-            header: 'Error',
-            message: 'Todos los campos son obligatorios.',
-            buttons: ['Aceptar']
-        });
-        await alert.present();
-        return;
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'Todos los campos son obligatorios.',
+        buttons: ['Aceptar']
+      });
+      await alert.present();
+      return;
     }
 
     const token = sessionStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', token || '');
 
     this.http.put(`${this.url}/api/user/update`, this.editProfileData, { headers }).subscribe(
-        async (response: any) => {
-            if (response.status === "success") {
-                const alert = await this.alertController.create({
-                    header: 'Actualización exitosa',
-                    message: 'Se actualizó el perfil con éxito.',
-                    buttons: ['Aceptar']
-                });
-                await alert.present();
-            } else {
-                const alert = await this.alertController.create({
-                    header: 'Error',
-                    message: 'Ocurrió un error al actualizar el perfil.',
-                    buttons: ['Aceptar']
-                });
-                await alert.present();
-            }
-
-            this.currentUserInfo = response.user; // Actualiza la información del perfil
-            this.closeEditProfileModal(); // Cierra el modal
-        },
-        async (error) => {
-            const alert = await this.alertController.create({
-                header: 'Error',
-                message: 'Ocurrió un error al actualizar el perfil.',
-                buttons: ['Aceptar']
-            });
-            await alert.present();
+      async (response: any) => {
+        if (response.status === "success") {
+          const alert = await this.alertController.create({
+            header: 'Actualización exitosa',
+            message: 'Se actualizó el perfil con éxito.',
+            buttons: ['Aceptar']
+          });
+          await alert.present();
+        } else {
+          const alert = await this.alertController.create({
+            header: 'Error',
+            message: 'Ocurrió un error al actualizar el perfil.',
+            buttons: ['Aceptar']
+          });
+          await alert.present();
         }
-    );
-}
 
+        this.currentUserInfo = response.user; // Actualiza la información del perfil
+        this.closeEditProfileModal(); // Cierra el modal
+      },
+      async (error) => {
+        const alert = await this.alertController.create({
+          header: 'Error',
+          message: 'Ocurrió un error al actualizar el perfil.',
+          buttons: ['Aceptar']
+        });
+        await alert.present();
+      }
+    );
+  }
+
+  // Método de cierre de sesión (logout)
   logout() {
-    let token = sessionStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     if (token) {
-        fetch('http://localhost:4000/api/user/logout', {
-            method: 'POST',
-            headers: {
-                'Authorization': `${token}`
-            }
-        })
-        .then(response => response.json())
-        .then(async data => {
-            if (data.status === "success") {
-                sessionStorage.clear();
-                const alert = document.createElement('ion-alert');
-                alert.header = 'Logout';
-                alert.message = 'Se cerró sesión con éxito';
-                alert.buttons = [{
-                    text: 'Aceptar',
-                    handler: () => {
-                        sessionStorage.removeItem("token");
-                        window.location.reload();
-                    }
-                }];
-                document.body.appendChild(alert);
-                await alert.present();
-            } else {
-                const alert = document.createElement('ion-alert');
-                alert.header = 'Error';
-                alert.message = 'Error al cerrar sesión';
-                alert.buttons = ['Aceptar'];
-                document.body.appendChild(alert);
-                await alert.present();
-            }
-        })
-        .catch(error => {
-            console.error("Error during logout:", error);
-        });
+      const headers = new HttpHeaders().set('Authorization', token);
+
+      // Usa HttpClient para enviar la solicitud de logout
+      this.http.post(`${this.url}/api/user/logout`, {}, { headers }).subscribe(
+        async (data: any) => {
+          if (data.status === "success") {
+            sessionStorage.clear();
+            const alert = await this.alertController.create({
+              header: 'Logout',
+              message: 'Se cerró sesión con éxito',
+              buttons: [{
+                text: 'Aceptar',
+                handler: () => {
+                  sessionStorage.removeItem("token");
+                  window.location.reload();
+                }
+              }]
+            });
+            await alert.present();
+          } else {
+            const alert = await this.alertController.create({
+              header: 'Error',
+              message: 'Error al cerrar sesión',
+              buttons: ['Aceptar']
+            });
+            await alert.present();
+          }
+        },
+        async (error) => {
+          console.error("Error al intentar cerrar sesión:", error);
+          const alert = await this.alertController.create({
+            header: 'Error',
+            message: 'Ocurrió un error al cerrar sesión.',
+            buttons: ['Aceptar']
+          });
+          await alert.present();
+        }
+      );
     } else {
-        console.error("No token found in sessionStorage.");
+      console.error("No token found in sessionStorage.");
     }
   }
 
@@ -231,29 +234,29 @@ export class Tab3Page implements OnInit {
   }
 
   closeImageSelectorModal() {
-      this.isImageSelectorModalOpen = false;
+    this.isImageSelectorModalOpen = false;
   }
 
   onImageSelected(event: any) {
-      const file = event.target.files[0];
-      if (file) {
-          const reader = new FileReader();
-          reader.onload = (e: any) => {
-              this.selectedImage = e.target.result; // Asigna la nueva imagen seleccionada para previsualización
-          };
-          reader.readAsDataURL(file);
-      }
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.selectedImage = e.target.result; // Asigna la nueva imagen seleccionada para previsualización
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   async updateProfileImage() {
     if (!this.selectedImage) {
-        const alert = await this.alertController.create({
-            header: 'Error',
-            message: 'Por favor selecciona una imagen para actualizar.',
-            buttons: ['Aceptar']
-        });
-        await alert.present();
-        return;
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'Por favor selecciona una imagen para actualizar.',
+        buttons: ['Aceptar']
+      });
+      await alert.present();
+      return;
     }
 
     const token = sessionStorage.getItem('token');
@@ -263,33 +266,33 @@ export class Tab3Page implements OnInit {
     formData.append('file0', (document.querySelector('input[type="file"]') as HTMLInputElement).files![0]);
 
     this.http.post(`${this.url}/api/user/upload`, formData, { headers }).subscribe(
-        async (response: any) => {
-            if (response.status === "success") {
-                const alert = await this.alertController.create({
-                    header: 'Actualización exitosa',
-                    message: 'La foto de perfil se actualizó con éxito.',
-                    buttons: ['Aceptar']
-                });
-                await alert.present();
-            } else {
-                const alert = await this.alertController.create({
-                    header: 'Error',
-                    message: 'Ocurrió un error al actualizar la foto de perfil.',
-                    buttons: ['Aceptar']
-                });
-                await alert.present();
-            }
-            this.closeImageSelectorModal();
-        },
-        async (error) => {
-            const alert = await this.alertController.create({
-                header: 'Error',
-                message: 'Ocurrió un error al actualizar la foto de perfil.',
-                buttons: ['Aceptar']
-            });
-            await alert.present();
+      async (response: any) => {
+        if (response.status === "success") {
+          const alert = await this.alertController.create({
+            header: 'Actualización exitosa',
+            message: 'La foto de perfil se actualizó con éxito.',
+            buttons: ['Aceptar']
+          });
+          await alert.present();
+        } else {
+          const alert = await this.alertController.create({
+            header: 'Error',
+            message: 'Ocurrió un error al actualizar la foto de perfil.',
+            buttons: ['Aceptar']
+          });
+          await alert.present();
         }
+        this.closeImageSelectorModal();
+      },
+      async (error) => {
+        const alert = await this.alertController.create({
+          header: 'Error',
+          message: 'Ocurrió un error al actualizar la foto de perfil.',
+          buttons: ['Aceptar']
+        });
+        await alert.present();
+      }
     );
   }
-  
+
 }
